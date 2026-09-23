@@ -242,11 +242,11 @@ NAMESPACE Simatic.Ax.Conveyor
             triggerCondition := triggerNextReadyToDeliver OR triggerNextDelivering OR triggerPrevReadyToDeliver OR triggerPrevDelivering OR triggerAutoReleaseEmpty;
             result := THIS.RetriggerConveyor(triggerCondition);
             IF (NOT triggerCondition AND NOT THIS.IsOccupied()) THEN
-                _conveyorFollowUpTimeActive := followUpSignal;
+                _conveyorFollowUpTimeActive := FALSE;
             END_IF;
             // Stop in case of:
             IF THIS.GetStartupStatus() <> StartUpStatus#AutoStartedUp THEN
-                _conveyorFollowUpTimeActive := FALSE;
+                _conveyorFollowUpTimeActive := followUpSignal;
             END_IF;
             // Offdelay for conveyor (Can be probibited by prohibitRunning)
             conveyorOffDelay(signal := _conveyorFollowUpTimeActive, duration := OffDelayTime);

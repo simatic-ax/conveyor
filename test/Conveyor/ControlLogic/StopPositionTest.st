@@ -26,20 +26,15 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
             sens := sensStateless;
             conv := convStateless;
             eq := eqStateless;
-        END_METHOD
-
-        /// Helper method to configure test dependencies
-        METHOD PROTECTED Setup
             // Arrange - Wire up dependencies
             stop.Equipment := eq;
             stop.Deliverer := conv;
             stop.StopSensor := sens;
         END_METHOD
 
+
         {Test}
         METHOD PUBLIC StopPos_is_not_occupied_when_Q_Sensor_False
-            // Arrange - Setup with sensor not covered
-            THIS.Setup();
             sens.QValue := FALSE;  // Sensor is free
             
             // Act - Evaluate stop position
@@ -52,7 +47,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC StopPos_is_not_occupied_when_Q_Sensor_False_And_Equipment_in_automatic
             // Arrange - Setup with sensor free and equipment running
-            THIS.Setup();
             sens.QValue := FALSE;  // Sensor is free
             eq.MockStatus := StartUpStatus#AutoStartedUp;  // Equipment is running
             
@@ -66,7 +60,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC StopPos_is_not_occupied_when_Q_Sensor_True_and_starting_up
             // Arrange - Setup with sensor covered but still starting up
-            THIS.Setup();
             sens.QValue := TRUE;  // Sensor is covered
             eq.MockStatus := StartUpStatus#AutoStartingUp;  // Still starting
             
@@ -80,7 +73,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC StopPos_is_not_occupied_when_Q_Sensor_True_and_not_released
             // Arrange - Setup with sensor covered but not released
-            THIS.Setup();
             sens.QValue := TRUE;  // Sensor is covered
             eq.MockStatus := StartUpStatus#NotReleased;  // Not released
             
@@ -94,7 +86,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC StopPos_is_occupied_when_Q_Sensor_True_and_is_released
             // Arrange - Setup with sensor covered and equipment released
-            THIS.Setup();
             sens.QValue := TRUE;  // Sensor is covered
             eq.MockStatus := StartUpStatus#AutoStartedUp;  // Equipment is running
             
@@ -108,7 +99,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC Uncover_Sensor_while_equipment_is_still_started_up_keeps_occupied
             // Arrange - First establish occupied state
-            THIS.Setup();
             THIS.StopPos_is_occupied_when_Q_Sensor_True_and_is_released();
             
             // Act - Uncover sensor while still running
@@ -123,7 +113,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC Stored_Occuoied_removes_when_state_Changes_from_StartingUp_to_StartedUp
             // Arrange - First establish occupied state
-            THIS.Setup();
             THIS.StopPos_is_occupied_when_Q_Sensor_True_and_is_released();
             
             // Act - Uncover sensor and change to starting up
@@ -141,7 +130,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC Sensor_Covered_During_Delivery_Is_Monitored
             // Arrange - Setup with sensor covered during delivery
-            THIS.Setup();
             sens.QValue := TRUE;  // Sensor is covered
             eq.MockStatus := StartUpStatus#AutoStartedUp;  // Equipment is running
             conv.RTD := DeliverState#Delivering;  // Delivery in progress
@@ -158,7 +146,6 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
         {Test}
         METHOD PUBLIC Sensor_Remains_Covered_After_Delivery_Completes
             // Arrange - First establish occupied state during delivery
-            THIS.Setup();
             sens.QValue := TRUE;  // Sensor is covered
             eq.MockStatus := StartUpStatus#AutoStartedUp;  // Equipment is running
             conv.RTD := DeliverState#Delivering;  // Delivery in progress
@@ -181,9 +168,10 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
                 i : INT;
             END_VAR
             // Arrange - Setup with sensor jammed (covered) during delivery
-            THIS.Setup();
             sens.QValue := TRUE;  // Sensor is covered (jammed)
             eq.MockStatus := StartUpStatus#AutoStartedUp;  // Equipment is running
+            eq.MockErrorCode := WORD#16#8120;
+            eq.MockErrorText := 'Sensor blocked timeout';
             conv.RTD := DeliverState#Delivering;  // Delivery in progress
             
             // First call to start the supervision monitoring
@@ -198,7 +186,7 @@ NAMESPACE Simatic.Ax.Conveyor.ControlLogic
             stop.EvaluateStopPos();
             
             // Assert - Error code and message should be set due to sensor blocking timeout
-            Equal(expected := TO_Word(ErrorState#OtherError), actual := eq.MockErrorCode);
+            Equal(expected := TO_WORD(StopPositionError#SensorBlocked), actual := eq.MockErrorCode);
             Equal(expected := 'Sensor blocked timeout', actual := eq.GetErrorText());
         END_METHOD
     END_CLASS
