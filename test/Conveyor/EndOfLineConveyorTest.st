@@ -72,6 +72,7 @@ NAMESPACE Simatic.Ax.Conveyor
         {Test}
         METHOD PUBLIC EndOfLine_conveyor_continues_running_until_item_leaves
             // Arrange - Start with item on sensor
+            AxUnit.Mocking.Mock('System.Timer.OffDelay', 'Simatic.Ax.Mocks.OffDelayMock_true');
             THIS.EndOfLine_conveyor_starts_transfer_when_sensor_covered();
             
             // Assert - Motor should be running

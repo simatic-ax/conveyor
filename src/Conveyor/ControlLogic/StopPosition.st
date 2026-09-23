@@ -25,6 +25,8 @@ NAMESPACE Simatic.Ax.Conveyor
             _itemInStopPosition : BOOL;
             /// Internal error flag
             _hasError : BOOL;
+            /// Previous error state for edge detection
+            _hasErrorOld : BOOL;
             /// Sensor blocking supervision with timeout detection
             _SensorBlocked : Supervision := (behavior := SupervisionBehavior#Reaction);
             /// Current startup status
@@ -48,6 +50,7 @@ NAMESPACE Simatic.Ax.Conveyor
                 _startedUpRis : BOOL;
                 _startedUp : BOOL;
                 _deliveringRis : BOOL;
+                _errorRis : BOOL;
             END_VAR
             // Read signals to avoid mutiple method calls
             _SensorBlocked.timeout := SensorMonitoringTime;
@@ -57,6 +60,7 @@ NAMESPACE Simatic.Ax.Conveyor
             _stopSensorCovered := StopSensor.Q();
             // Detect rising edge of delivering (transfer starts)
             _deliveringRis := _delivering AND NOT (_deliveringOld);
+            _deliveringOld := _delivering;
             // Start supervision whenever a transfer is active and monitoring is not yet running
             IF (_delivering AND NOT _SensorBlocked.IsActive()) THEN
                 _SensorBlocked.Start();
@@ -70,11 +74,10 @@ NAMESPACE Simatic.Ax.Conveyor
             _SensorBlocked.Execute(signal := _stopSensorCovered AND _delivering);
             // Check for timeout error
             _hasError := _SensorBlocked.GetError() = SupervisionError#TIMEOUT;
-            IF (NOT _hasError AND _delivering AND _stopSensorCovered AND _SensorBlocked.IsActive()) THEN
-                _hasError := TRUE;
-            END_IF;
-            IF (_hasError) THEN
-                Equipment.SetError(errorState := ErrorState#OtherError, errorText := 'Sensor blocked timeout');
+            _errorRis := _hasError AND NOT (_hasErrorOld);
+            _hasErrorOld := _hasError;
+            IF (_errorRis) THEN
+                Equipment.SetError(errorState := StopPositionError#SensorBlocked, errorText := 'Sensor blocked timeout');
             END_IF;
             // Update occupancy logic
             IF (_stopSensorCovered AND _startUpStatus = StartUpStatus#AutoStartedUp) THEN
@@ -89,8 +92,7 @@ NAMESPACE Simatic.Ax.Conveyor
                     _itemInStopPosition := FALSE;
                 END_IF;
             END_IF;
-            // Store old delivering value for edge detection
-            _deliveringOld := _delivering;
+
             EvaluateStopPos := _itemInStopPosition;
         END_METHOD
         /// Returns whether the stop position is logically occupied
@@ -117,6 +119,7 @@ NAMESPACE Simatic.Ax.Conveyor
                 _SensorBlocked.Reset();
                 // Clear error flag
                 _hasError := FALSE;
+                _hasErrorOld := FALSE;
                 // Reset edge detection flags
                 _deliveringOld := FALSE;
                 _startUpStatusOld := FALSE;

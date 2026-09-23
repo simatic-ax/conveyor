@@ -115,6 +115,7 @@ NAMESPACE Simatic.Ax.Conveyor
             // Arrange - Setup conveyor with sensor covered and next conveyor ready
             nextConv.RTR := ReceiveState#ReadyToReceive;
             sensor.QValue := TRUE;  // Item on sensor
+            AxUnit.Mocking.Mock('System.Timer.OffDelay', 'Simatic.Ax.Mocks.OffDelayMock_true');
             
             // Act - Run cyclic execution to start transfer
             conv.RunCyclic();
@@ -123,7 +124,7 @@ NAMESPACE Simatic.Ax.Conveyor
             // Act - Item leaves sensor (transfer completes)
             sensor.QValue := FALSE;
             conv.RunCyclic();
-            
+           
             // Assert - Transfer should be complete, motor still running due to off-delay
             Equal(expected := TRUE, actual := conv.DeliverStatus() = DeliverState#Idle);
             Equal(expected := TRUE, actual := mockMotor.IsRunning());
