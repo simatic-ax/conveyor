@@ -16,7 +16,6 @@ apax add @simatic-ax/conveyor
 
 ```st
 USING Simatic.Ax.Conveyor;
-USING Simatic.Ax.AutomationFramework;
 ```
 
 ## Documentation
