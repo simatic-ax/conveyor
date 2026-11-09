@@ -156,7 +156,7 @@ NAMESPACE MotorTests.TimeProvider
             mockPayload.systemTime := LDATE_AND_TIME#1970-01-01-00:00:01;
             
             // Install the mock for GetSystemDateTime with payload
-            AxUnit.Mocking.Mock(NAME_OF(Siemens.Simatic.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
+            AxUnit.Mocking.Mock(NAME_OF(Siemens.S7.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
         END_METHOD
 
         {Test}
@@ -262,7 +262,7 @@ NAMESPACE MotorTests.TimeProvider
             mockPayload.Reset();
             
             // Reinstall mock with new sequence
-            AxUnit.Mocking.Mock(NAME_OF(Siemens.Simatic.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
+            AxUnit.Mocking.Mock(NAME_OF(Siemens.S7.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
             
             // Act - Measure intervals
             deltaMs1 := timeProvider.GetCurrentTimeMs();  // First call: initialize, returns 0
@@ -291,7 +291,7 @@ NAMESPACE MotorTests.TimeProvider
             mockPayload.SetTimeAt(index := 2, timeValue := time2);
             mockPayload.Reset();
             
-            AxUnit.Mocking.Mock(NAME_OF(Siemens.Simatic.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
+            AxUnit.Mocking.Mock(NAME_OF(Siemens.S7.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
             
             // Act
             deltaNs1 := timeProvider.GetCurrentTimeNs();  // Initialize
@@ -322,7 +322,7 @@ NAMESPACE MotorTests.TimeProvider
             mockPayload.SetTimeAt(index := 3, timeValue := t3);
             mockPayload.Reset();
             
-            AxUnit.Mocking.Mock(NAME_OF(Siemens.Simatic.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
+            AxUnit.Mocking.Mock(NAME_OF(Siemens.S7.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
             
             // Act - Measure three intervals
             delta1 := timeProvider.GetCurrentTimeMs();  // Initialize: 0
@@ -356,7 +356,7 @@ NAMESPACE MotorTests.TimeProvider
             mockPayload.SetTimeAt(index := 2, timeValue := tRampEnd);
             mockPayload.Reset();
             
-            AxUnit.Mocking.Mock(NAME_OF(Siemens.Simatic.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
+            AxUnit.Mocking.Mock(NAME_OF(Siemens.S7.Clocks.GetSystemDateTime), NAME_OF(Simatic.Ax.Mocks.GetSystemTimeMock), mockPayload);
             
             // Act - Simulate motor ramp timing
             initDelta := timeProvider.GetCurrentTimeMs();     // Initialize
