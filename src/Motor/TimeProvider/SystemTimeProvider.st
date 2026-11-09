@@ -1,4 +1,4 @@
-USING Siemens.Simatic.Clocks;
+USING Siemens.S7.Clocks;
 
 NAMESPACE Simatic.Ax.Motor
     /// System time provider using Siemens.Simatic.Clocks
