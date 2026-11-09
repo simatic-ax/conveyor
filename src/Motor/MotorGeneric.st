@@ -201,22 +201,22 @@ NAMESPACE Simatic.Ax.Motor
         /// Updates timer states using effective values
         METHOD PUBLIC Update
             VAR_TEMP
-                accelTime : TIME;
-                decelTime : TIME;
+                accelTime : LTIME;
+                decelTime : LTIME;
             END_VAR
             
             // Calculate acceleration time (time to reach effective speed)
             IF _effectiveAcceleration > 0.0 THEN
-                accelTime := TO_TIME(TO_LINT((_effectiveSpeed / _effectiveAcceleration) * 1000.0)); // Convert to milliseconds
+                accelTime := TO_LTIME(TO_LINT((_effectiveSpeed / _effectiveAcceleration) * 1000.0)); // Convert to milliseconds
             ELSE
-                accelTime := T#1s; // Default 1 second
+                accelTime := LT#1s; // Default 1 second
             END_IF;
             
             // Calculate deceleration time (time to stop from effective speed)
             IF _effectiveDeceleration > 0.0 THEN
-                decelTime := TO_TIME(TO_LINT((_effectiveSpeed / _effectiveDeceleration) * 1000.0)); // Convert to milliseconds
+                decelTime := TO_LTIME(TO_LINT((_effectiveSpeed / _effectiveDeceleration) * 1000.0)); // Convert to milliseconds
             ELSE
-                decelTime := T#1s; // Default 1 second
+                decelTime := LT#1s; // Default 1 second
             END_IF;
             
             // OnDelay timer for acceleration

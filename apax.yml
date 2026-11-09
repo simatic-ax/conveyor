@@ -9,20 +9,11 @@ type: lib
 repository:
   type: git
   url: https://github.com/simatic-ax/conveyor
-# Environment variables
-variables:
-  APAX_BUILD_ARGS:
-    - '--log Trace'
-    - '--simulation'
-    - '--debug'
-targets:
-  - 's7'
-  - 'llvm'
 # Dependencies
 devDependencies:
-  '@ax/sdk': ^2510.20.0
+  '@ax-as/s7-sdk': ^2610.0.2
   "@simatic-ax/snippetscollection": ^1.1.0
-  "@ax/axunit-mocking": ^9.6.6
+  "@ax-as/axunit-mocking": ^10.0.136
 # Registry information, where the package will be published
 registries:
   '@simatic-ax': 'https://npm.pkg.github.com/'
@@ -39,12 +30,12 @@ files:
   - 'LICENSE.md'
   - 'docs'
   - 'snippets'
-  - 'bin/s7'
-  - 'bin/llvm'
+  - 'out/Debug/s7'
+  - 'out/Debug/llvm'
 dependencies:
-  "@simatic-ax/io": ^11.0.0
-  "@ax/system-timer": ^10.4.66
-  "@simatic-ax/automationbase": ^1.0.1
-  "@ax/simatic-clocks": ^11.0.116
+  "@simatic-ax/io": ^12.0.0
+  "@ax-as/system-timer-lib": ^11.0.232
+  "@simatic-ax/automationbase": ^2.0.0
+  "@ax-as/s7-clocks-lib": ^12.0.86
 catalogs:
-  "@ax/simatic-ax": ^2510.0.0
+  "@ax-as/s7-catalog": ^2610.0.2
